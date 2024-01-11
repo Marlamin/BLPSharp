@@ -160,10 +160,6 @@ namespace SereniaBLPLib
                 }
 
                 byte[] data = new byte[mipSize];
-                // fill with 0s
-                for (int i = 0; i < data.Length; i++)
-                    data[i] = 0;
-
                 stream.Position = mipOffsets[mipmapLevel];
                 stream.Read(data, 0, data.Length);
                 return data;
