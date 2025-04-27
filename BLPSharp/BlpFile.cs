@@ -71,9 +71,8 @@ namespace BLPSharp
         private Stream stream; // Reference of the stream
 
         /// <summary>
-        /// Extracts the palettized Image-Data from the given Mipmap and returns a byte-Array in the 32Bit RGBA-Format
+        /// Extracts the palettized Image-Data and returns a byte-Array in the 32Bit RGBA-Format
         /// </summary>
-        /// <param name="mipmap">The desired Mipmap-Level. If the given level is invalid, the smallest available level is choosen</param>
         /// <param name="w"></param>
         /// <param name="h"></param>
         /// <param name="data"></param>
@@ -117,6 +116,8 @@ namespace BLPSharp
         /// Returns the raw Mipmap-Image Data. This data can either be compressed or uncompressed, depending on the Header-Data
         /// </summary>
         /// <param name="mipmapLevel"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         /// <returns></returns>
         private byte[] GetPictureData(int mipmapLevel, int width = 0, int height = 0)
         {
@@ -253,6 +254,8 @@ namespace BLPSharp
         /// Returns array of pixels in BGRA or RGBA order
         /// </summary>
         /// <param name="mipmapLevel"></param>
+        /// <param name="w"></param>
+        /// <param name="h"></param>
         /// <returns></returns>
         public byte[] GetPixels(int mipmapLevel, out int w, out int h)
         {

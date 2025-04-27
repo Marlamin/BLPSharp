@@ -2,10 +2,47 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Title>BLPSharp</Title>
+    <Authors>WoWDev</Authors>
+    <Description>Library for decoding Blizzard's BLP textures</Description>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/wowdev/BLPSharp.git</RepositoryUrl>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>library,BLP,World of Warcraft</PackageTags>
+    <PackageProjectUrl>https://github.com/wowdev/BLPSharp</PackageProjectUrl>
+    <PackageIcon>nuget-icon.png</PackageIcon>
+    <IncludeSource>true</IncludeSource>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="TinyBCSharp" Version="0.1.2" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>true</Optimize>
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../nuget-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
