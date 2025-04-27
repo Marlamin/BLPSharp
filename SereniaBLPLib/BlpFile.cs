@@ -1,31 +1,5 @@
-﻿/*
- * Copyright (c) <2011> <by Xalcon @ mmowned.com-Forum>
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
+﻿using System;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using TinyBCSharp;
 
@@ -262,33 +236,7 @@ namespace SereniaBLPLib
             switch (colorEncoding)
             {
                 case BlpColorEncoding.Jpeg:
-                    {
-                        if (jpegHeader.Length != 0)
-                        {
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                ms.Write(jpegHeader, 0, jpegHeader.Length);
-                                ms.Write(data, 0, data.Length);
-                                ms.Position = 0;
-
-                                using (var img = SixLabors.ImageSharp.Image.Load<Rgba32>(ms))
-                                {
-                                    byte[] pixelBytes = new byte[img.Width * img.Height * Unsafe.SizeOf<Rgba32>()];
-                                    img.CopyPixelDataTo(pixelBytes);
-                                    return pixelBytes;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            using (var img = SixLabors.ImageSharp.Image.Load<Rgba32>(data))
-                            {
-                                byte[] pixelBytes = new byte[img.Width * img.Height * Unsafe.SizeOf<Rgba32>()];
-                                img.CopyPixelDataTo(pixelBytes);
-                                return pixelBytes;
-                            }
-                        }
-                    }
+                    throw new Exception("JPEG support not implemented yet");
                 case BlpColorEncoding.Palette:
                     return GetPictureUncompressedByteArray(w, h, data);
                 case BlpColorEncoding.Dxt:
@@ -297,39 +245,8 @@ namespace SereniaBLPLib
                 case BlpColorEncoding.Argb8888:
                     return data;
                 default:
-                    return Array.Empty<byte>();
+                    return [];
             }
-        }
-
-        /// <summary>
-        /// Converts the BLP to a System.Drawing.Bitmap
-        /// </summary>
-        /// <param name="mipmapLevel">The desired Mipmap-Level. If the given level is invalid, the smallest available level is choosen</param>
-        /// <returns>The Bitmap</returns>
-        public Bitmap GetBitmap(int mipmapLevel)
-        {
-            byte[] pic = GetPixels(mipmapLevel, out int w, out int h);
-
-            Bitmap bmp = new Bitmap(w, h);
-
-            // Faster bitmap Data copy
-            BitmapData bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            Marshal.Copy(pic, 0, bmpdata.Scan0, pic.Length); // copy! :D
-            bmp.UnlockBits(bmpdata);
-
-            return bmp;
-        }
-
-        /// <summary>
-        /// Converts the BLP to a SixLabors.ImageSharp.Image
-        /// </summary>
-        public Image<Rgba32> GetImage(int mipmapLevel)
-        {
-            byte[] pic = GetPixels(mipmapLevel, out int w, out int h);
-
-            var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(pic, w, h);
-
-            return image;
         }
 
         /// <summary>
