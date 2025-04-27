@@ -28,6 +28,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using TinyBCSharp;
 
 namespace SereniaBLPLib
 {
@@ -316,11 +317,8 @@ namespace SereniaBLPLib
                 case BlpColorEncoding.Palette:
                     return GetPictureUncompressedByteArray(w, h, data);
                 case BlpColorEncoding.Dxt:
-                    DXTDecompression.DXTFlags flag = (alphaSize > 1) ? ((preferredFormat == BlpPixelFormat.Dxt5) ? DXTDecompression.DXTFlags.DXT5 : DXTDecompression.DXTFlags.DXT3) : DXTDecompression.DXTFlags.DXT1;
-                    if (returnRaw)
-                        return data;
-                    else
-                        return DXTDecompression.DecompressImage(w, h, data, flag);
+                    var decoder = BlockDecoder.Create((alphaSize > 1) ? ((preferredFormat == BlpPixelFormat.Dxt5) ? BlockFormat.BC3 : BlockFormat.BC2) : BlockFormat.BC1);
+                    return decoder.Decode(w, h, data);
                 case BlpColorEncoding.Argb8888:
                     return data;
                 default:
