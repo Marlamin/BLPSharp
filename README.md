@@ -23,7 +23,7 @@ Due to not relying on any specific image library anymore, support for BLPs conta
 ```csharp
     Bitmap bmp = new Bitmap(w, h);
     BitmapData bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-    Marshal.Copy(pixels, 0, bmpdata.Scan0, pic.Length);
+    Marshal.Copy(pixels, 0, bmpdata.Scan0, pixels.Length);
     bmp.UnlockBits(bmpdata);
 ```
 
