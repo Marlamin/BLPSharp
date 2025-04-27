@@ -4,6 +4,8 @@ BLPSharp (formerly known as SereniaBLPLib)
 
 Initially created under the name of SereniaBLPLib by Xalcon & later maintained by hazzik & tomrus88. 
 
+Available on [NuGet](https://www.nuget.org/packages/BLPSharp/).
+
 ## Notes
 Due to not relying on any specific image library anymore, support for BLPs containing JPEG-encoded data was removed and will throw a NYI exception. If someone wants to add this back without relying on a specific image library, feel free to open a PR.
 
