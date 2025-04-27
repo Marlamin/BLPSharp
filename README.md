@@ -13,13 +13,12 @@ Due to not relying on any specific image library anymore, support for BLPs conta
     {
         var blp = new BlpFile(fs);
         var pixels = blp.GetPixels(mipmapLevel, out int w, out int h);
-        // Image handling code, see below!
+        // Pixel handling code, see below!
     }
 ```
 
 ### System.Drawing.Bitmap
 ```csharp
-    var pixels = blp.GetPixels(mipmapLevel, out int w, out int h);
     Bitmap bmp = new Bitmap(w, h);
     BitmapData bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
     Marshal.Copy(pixels, 0, bmpdata.Scan0, pic.Length);
@@ -28,13 +27,11 @@ Due to not relying on any specific image library anymore, support for BLPs conta
 
 ### ImageSharp
 ```csharp
-    var pixels = blp.GetPixels(mipmapLevel, out int w, out int h);
     var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(pixels, w, h);
 ```
 
 ### SkiaSharp
 ```csharp
-    var pixels = blp.GetPixels(0, out var w, out var h);
     var bitmap = new SKBitmap(w, h);
     using var pixmap = bitmap.PeekPixels();
     var data = pixmap.GetPixelSpan<byte>();
