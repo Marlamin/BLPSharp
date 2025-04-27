@@ -1,5 +1,6 @@
 ﻿using SkiaSharp;
 using SereniaBLPLib;
+using System.Diagnostics;
 
 namespace BLPTest
 {
@@ -9,7 +10,7 @@ namespace BLPTest
         {
             if(!Directory.Exists("in"))
             {
-                Console.WriteLine("Please create an 'input' directory and place your BLP files in it.");
+                Console.WriteLine("Please create an 'in' directory and place your BLP files in it.");
                 return;
             }
 
@@ -19,8 +20,11 @@ namespace BLPTest
                 Directory.Delete("out", true);
 
             Directory.CreateDirectory("out");
+
+            var sw = new Stopwatch();
             foreach (var testFile in testFiles)
             {
+                sw.Restart();
                 using (var fs = File.OpenRead(testFile))
                 {
                     var blp = new BlpFile(fs);
@@ -38,6 +42,8 @@ namespace BLPTest
                         image.SaveTo(stream);
                     }
                 }
+                sw.Stop();
+                Console.WriteLine($"Processed {Path.GetFileName(testFile)} in {sw.ElapsedMilliseconds}ms");
             }
         }
 

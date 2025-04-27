@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SereniaBLPLib\SereniaBLPLib.csproj" />
+    <ProjectReference Include="..\SereniaBLPLib\BLPSharp.csproj" />
   </ItemGroup>
 
 </Project>
