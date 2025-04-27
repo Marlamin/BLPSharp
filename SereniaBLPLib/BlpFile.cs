@@ -19,7 +19,6 @@
  */
 
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Drawing;
@@ -151,6 +150,7 @@ namespace SereniaBLPLib
             {
                 var mipSize = mipSizes[mipmapLevel];
 
+                // Calculate size of mipmap ourselves since included sizes can be wrong
                 if ((preferredFormat == BlpPixelFormat.Dxt5) || (preferredFormat == BlpPixelFormat.Dxt3))
                 {
                     mipSize = (uint)(Math.Floor((double)(width + 3) / 4) * Math.Floor((double)(height + 3) / 4) * 16);
@@ -162,7 +162,7 @@ namespace SereniaBLPLib
 
                 byte[] data = new byte[mipSize];
                 stream.Position = mipOffsets[mipmapLevel];
-                stream.Read(data, 0, data.Length);
+                stream.ReadExactly(data, 0, data.Length);
                 return data;
             }
             return null;
@@ -257,7 +257,7 @@ namespace SereniaBLPLib
         /// <summary>
         /// Returns the uncompressed image as a byte array in the 32pppRGBA-Format
         /// </summary>
-        private byte[] GetImageBytes(int w, int h, byte[] data, bool returnRaw = false)
+        private byte[] GetImageBytes(int w, int h, byte[] data)
         {
             switch (colorEncoding)
             {
@@ -288,31 +288,6 @@ namespace SereniaBLPLib
                                 return pixelBytes;
                             }
                         }
-
-                        //using (var img = SixLabors.ImageSharp.Image.Load<Rgba32>(data))
-                        //{
-                        //    byte[] rgba = new byte[width * height * 4];
-                        //    img.ProcessPixelRows(accessor =>
-                        //    {
-                        //        int i = 0;
-                        //        for (int y = 0; y < accessor.Height; y++)
-                        //        {
-                        //            Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
-
-                        //            for (int x = 0; x < pixelRow.Length; x++)
-                        //            {
-                        //                ref Rgba32 pixel = ref pixelRow[x];
-
-                        //                rgba[i + 0] = pixel.R;
-                        //                rgba[i + 1] = pixel.G;
-                        //                rgba[i + 2] = pixel.B;
-                        //                rgba[i + 3] = pixel.A;
-                        //                i += 4;
-                        //            }
-                        //        }
-                        //    });
-                        //    return rgba;
-                        //}
                     }
                 case BlpColorEncoding.Palette:
                     return GetPictureUncompressedByteArray(w, h, data);
@@ -333,7 +308,7 @@ namespace SereniaBLPLib
         /// <returns>The Bitmap</returns>
         public Bitmap GetBitmap(int mipmapLevel)
         {
-            byte[] pic = GetPixels(mipmapLevel, out int w, out int h, colorEncoding != BlpColorEncoding.Argb8888);
+            byte[] pic = GetPixels(mipmapLevel, out int w, out int h);
 
             Bitmap bmp = new Bitmap(w, h);
 
@@ -350,7 +325,7 @@ namespace SereniaBLPLib
         /// </summary>
         public Image<Rgba32> GetImage(int mipmapLevel)
         {
-            byte[] pic = GetPixels(mipmapLevel, out int w, out int h, colorEncoding == BlpColorEncoding.Argb8888);
+            byte[] pic = GetPixels(mipmapLevel, out int w, out int h);
 
             var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(pic, w, h);
 
@@ -362,7 +337,7 @@ namespace SereniaBLPLib
         /// </summary>
         /// <param name="mipmapLevel"></param>
         /// <returns></returns>
-        public byte[] GetPixels(int mipmapLevel, out int w, out int h, bool bgra = true, bool returnRaw = false)
+        public byte[] GetPixels(int mipmapLevel, out int w, out int h)
         {
             if (mipmapLevel >= MipMapCount)
                 mipmapLevel = MipMapCount - 1;
@@ -374,12 +349,9 @@ namespace SereniaBLPLib
             h = height / scale;
 
             byte[] data = GetPictureData(mipmapLevel, w, h);
-            if(returnRaw)
-                return data;
-
             byte[] pic = GetImageBytes(w, h, data); // This bytearray stores the Pixel-Data
 
-            if (bgra) // when we want to copy the pixeldata directly into the bitmap, we have to convert them into BGRA before doing so
+            if (colorEncoding != BlpColorEncoding.Argb8888) // when we want to copy the pixeldata directly into the bitmap, we have to convert them into BGRA before doing so
                 ARGBColor8.ConvertToBGRA(pic);
 
             return pic;
