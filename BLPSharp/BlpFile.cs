@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using TinyBCSharp;
 
-namespace SereniaBLPLib
+namespace BLPSharp
 {
     // Some Helper Struct to store Color-Data
     public struct ARGBColor8
@@ -53,7 +53,7 @@ namespace SereniaBLPLib
         Bc5 = 11
     }
 
-    public sealed class BlpFile : IDisposable
+    public sealed class BLPFile : IDisposable
     {
         private readonly uint formatVersion; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
         private readonly BlpColorEncoding colorEncoding; // 1 = Uncompressed, 2 = DirectX Compressed
@@ -159,7 +159,7 @@ namespace SereniaBLPLib
         private const int BLP1Magic = 0x31504c42;
         private const int BLP2Magic = 0x32504c42;
 
-        public BlpFile(Stream stream)
+        public BLPFile(Stream stream)
         {
             this.stream = stream;
 

@@ -11,7 +11,7 @@ namespace BLPBench
         {
             using(var stream = new MemoryStream(data))
             {
-                using (var blp = new SereniaBLPLib.BlpFile(stream))
+                using (var blp = new BLPSharp.BLPFile(stream))
                 {
                     blp.GetPixels(0, out var width, out var height);
                 }

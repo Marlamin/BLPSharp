@@ -1,5 +1,5 @@
 ﻿using SkiaSharp;
-using SereniaBLPLib;
+using BLPSharp;
 using System.Diagnostics;
 
 namespace BLPTest
@@ -27,7 +27,7 @@ namespace BLPTest
                 sw.Restart();
                 using (var fs = File.OpenRead(testFile))
                 {
-                    var blp = new BlpFile(fs);
+                    var blp = new BLPFile(fs);
                         
                     var pixels = blp.GetPixels(0, out var width, out var height);
                     var bitmap = new SKBitmap((int)width, (int)height);
