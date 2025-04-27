@@ -83,8 +83,8 @@ namespace SereniaBLPLib
     {
         private readonly uint formatVersion; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
         private readonly BlpColorEncoding colorEncoding; // 1 = Uncompressed, 2 = DirectX Compressed
-        private readonly byte alphaSize; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
-        private readonly BlpPixelFormat preferredFormat; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
+        public readonly byte alphaSize; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
+        public readonly BlpPixelFormat preferredFormat; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
         private readonly byte hasMips; // If true (1), then there are Mipmaps
         private readonly int width; // X Resolution of the biggest Mipmap
         private readonly int height; // Y Resolution of the biggest Mipmap
@@ -144,11 +144,22 @@ namespace SereniaBLPLib
         /// </summary>
         /// <param name="mipmapLevel"></param>
         /// <returns></returns>
-        private byte[] GetPictureData(int mipmapLevel)
+        private byte[] GetPictureData(int mipmapLevel, int width = 0, int height = 0)
         {
             if (stream != null)
             {
-                byte[] data = new byte[mipSizes[mipmapLevel]];
+                var mipSize = mipSizes[mipmapLevel];
+
+                if ((preferredFormat == BlpPixelFormat.Dxt5) || (preferredFormat == BlpPixelFormat.Dxt3))
+                {
+                    mipSize = (uint)(Math.Floor((double)(width + 3) / 4) * Math.Floor((double)(height + 3) / 4) * 16);
+                }
+                else if (preferredFormat == BlpPixelFormat.Dxt1)
+                {
+                    mipSize = (uint)(Math.Floor((double)(width + 3) / 4) * Math.Floor((double)(height + 3) / 4) * 8);
+                }
+
+                byte[] data = new byte[mipSize];
                 stream.Position = mipOffsets[mipmapLevel];
                 stream.Read(data, 0, data.Length);
                 return data;
@@ -245,7 +256,7 @@ namespace SereniaBLPLib
         /// <summary>
         /// Returns the uncompressed image as a byte array in the 32pppRGBA-Format
         /// </summary>
-        private byte[] GetImageBytes(int w, int h, byte[] data)
+        private byte[] GetImageBytes(int w, int h, byte[] data, bool returnRaw = false)
         {
             switch (colorEncoding)
             {
@@ -306,7 +317,10 @@ namespace SereniaBLPLib
                     return GetPictureUncompressedByteArray(w, h, data);
                 case BlpColorEncoding.Dxt:
                     DXTDecompression.DXTFlags flag = (alphaSize > 1) ? ((preferredFormat == BlpPixelFormat.Dxt5) ? DXTDecompression.DXTFlags.DXT5 : DXTDecompression.DXTFlags.DXT3) : DXTDecompression.DXTFlags.DXT1;
-                    return DXTDecompression.DecompressImage(w, h, data, flag);
+                    if (returnRaw)
+                        return data;
+                    else
+                        return DXTDecompression.DecompressImage(w, h, data, flag);
                 case BlpColorEncoding.Argb8888:
                     return data;
                 default:
@@ -350,7 +364,7 @@ namespace SereniaBLPLib
         /// </summary>
         /// <param name="mipmapLevel"></param>
         /// <returns></returns>
-        public byte[] GetPixels(int mipmapLevel, out int w, out int h, bool bgra = true)
+        public byte[] GetPixels(int mipmapLevel, out int w, out int h, bool bgra = true, bool returnRaw = false)
         {
             if (mipmapLevel >= MipMapCount)
                 mipmapLevel = MipMapCount - 1;
@@ -361,7 +375,10 @@ namespace SereniaBLPLib
             w = width / scale;
             h = height / scale;
 
-            byte[] data = GetPictureData(mipmapLevel);
+            byte[] data = GetPictureData(mipmapLevel, w, h);
+            if(returnRaw)
+                return data;
+
             byte[] pic = GetImageBytes(w, h, data); // This bytearray stores the Pixel-Data
 
             if (bgra) // when we want to copy the pixeldata directly into the bitmap, we have to convert them into BGRA before doing so
