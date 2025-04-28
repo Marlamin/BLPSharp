@@ -29,12 +29,12 @@ Due to not relying on any specific image library anymore, support for BLPs conta
 
 ### ImageSharp
 ```csharp
-    var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(pixels, w, h);
+    var image = SixLabors.ImageSharp.Image.LoadPixelData<Bgra32>(pixels, w, h);
 ```
 
 ### SkiaSharp
 ```csharp
-    var bitmap = new SKBitmap(w, h);
+    var bitmap = new SKBitmap(w, h, SKColorType.Bgra8888, SKAlphaType.Unpremul);
     using var pixmap = bitmap.PeekPixels();
     var data = pixmap.GetPixelSpan<byte>();
     pixels.CopyTo(data);
